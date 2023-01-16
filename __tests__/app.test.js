@@ -65,3 +65,84 @@ describe('GET /api/categories', () =>
         });
     });
 });
+
+describe('GET /api/reviews', () =>
+{
+    test('server responds with 200 status code', () =>
+    {
+        return request(app)
+        .get('/api/reviews')
+        .expect(200);
+    });
+
+    test('server sends response with an array of review objects', () =>
+    {
+        return request(app)
+        .get('/api/reviews')
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews).not.toBe(undefined);
+            for(let review of reviews)
+                expect(typeof review).toBe('object');
+        });
+    });
+
+    test('to check each review object has relevant properties including comment_count', () =>
+    {
+        return request(app)
+        .get('/api/reviews')
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            for(let review of reviews)
+            {
+                expect(review).toHaveProperty('owner');
+                expect(review).toHaveProperty('title');
+                expect(review).toHaveProperty('review_id');
+                expect(review).toHaveProperty('category');
+                expect(review).toHaveProperty('review_img_url');
+                expect(review).toHaveProperty('created_at');
+                expect(review).toHaveProperty('votes');
+                expect(review).toHaveProperty('designer');
+                expect(review).toHaveProperty('comment_count');
+            }    
+        });
+    });
+
+    test('to check if the dates are fetched in descending order', ()=>
+    {
+        return request(app)
+        .get('/api/reviews')
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews[0].created_at.includes('2021-01-18')).toBe(true);
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('server responds with 404 status code for incorrect path provided', () =>
+        {
+            return request(app)
+            .get('/api/review')
+            .expect(404)
+            .then((response)=>
+            {
+                expect(response.res.statusMessage).toBe('Not Found');
+            });
+        });
+
+        test('to check if the responded review objects are sorted according to date in descending order by default', () =>
+        {
+            return request(app)
+            .get('/api/reviews')
+            .then((response)=>
+            {
+                const { reviews } = response.body;
+                expect(reviews[0].created_at.includes('1970-01-10')).toBe(false);
+            });
+        });
+    });
+})
