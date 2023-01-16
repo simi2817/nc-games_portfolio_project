@@ -4,6 +4,7 @@ const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data/index');
 const db = require('../db/connection');
 
+
 beforeEach(()=>
 {
     return seed(testData);
@@ -31,6 +32,9 @@ describe('GET /api/categories', () =>
         {
             const { categories } = response.body;
             expect(categories).not.toBe(undefined);
+
+            expect(categories.length).toBeGreaterThan(0);
+
             for(let category of categories)
                 expect(typeof category).toBe('object');
         });
@@ -43,6 +47,9 @@ describe('GET /api/categories', () =>
         .then((response) =>
         {
             const { categories } = response.body;
+
+            expect(categories.length).toBeGreaterThan(0);
+
             for(let category of categories)
             {
                 expect(category).toHaveProperty('slug');
@@ -82,7 +89,10 @@ describe('GET /api/reviews', () =>
         .then((response) =>
         {
             const { reviews } = response.body;
+            
             expect(reviews).not.toBe(undefined);
+            
+            expect(reviews.length).toBeGreaterThan(0);
             for(let review of reviews)
                 expect(typeof review).toBe('object');
         });
@@ -95,6 +105,9 @@ describe('GET /api/reviews', () =>
         .then((response) =>
         {
             const { reviews } = response.body;
+            
+            expect(reviews.length).toBeGreaterThan(0);
+
             for(let review of reviews)
             {
                 expect(review).toHaveProperty('owner');
@@ -118,6 +131,8 @@ describe('GET /api/reviews', () =>
         {
             const { reviews } = response.body;
             expect(reviews[0].created_at.includes('2021-01-18')).toBe(true);
+            expect(reviews).toBeSorted({key: 'created_at',
+                descending: true});
         });
     });
 
@@ -142,6 +157,8 @@ describe('GET /api/reviews', () =>
             {
                 const { reviews } = response.body;
                 expect(reviews[0].created_at.includes('1970-01-10')).toBe(false);
+                expect(reviews).toBeSorted({key: 'created_at',
+                ascending: false});
             });
         });
     });
