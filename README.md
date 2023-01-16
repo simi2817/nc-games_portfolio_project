@@ -1,10 +1,12 @@
 # Northcoders House of Games API
 
-## Background
+## To create environment variables
 
-We will be building an API for the purpose of accessing application data programmatically. The intention here is to mimic the building of a real world backend service (such as reddit) which should provide this information to the front end architecture.
+Please create two files :-
+1) .env.test  with PGDATABASE=nc_games_test
+2) .env.development with PGDATABASE=nc_games
 
-Your database will be PSQL, and you will interact with it using [node-postgres](https://node-postgres.com/).
+With the above files, connection.js would be able to connect test and development databases.
 
 ## Kanban
 
