@@ -28,4 +28,26 @@ const fetchAllReviews = () =>
     });
 }
 
-module.exports = { fetchAllCategories, fetchAllReviews };
+const fetchReviewById = (reviewId) =>
+{
+    if(/\d+/.test(reviewId))
+    {
+        const selectReviewByIdQuery = 
+        `SELECT * FROM reviews
+        WHERE review_id = $1;`;
+
+        return db.query(selectReviewByIdQuery, [reviewId])
+        .then(({ rows }) => 
+        {
+            if(rows.length === 1)
+                return rows;
+            else
+                return Promise.reject({status: 404, message: 'review_id not found!'});
+        });
+    } 
+
+    else
+        return Promise.reject({status: 400, message: 'Invalid input!'});
+    
+}
+module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById };

@@ -4,7 +4,6 @@ const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data/index');
 const db = require('../db/connection');
 
-
 beforeEach(()=>
 {
     return seed(testData);
@@ -65,9 +64,9 @@ describe('GET /api/categories', () =>
             return request(app)
             .get('/api/category')
             .expect(404)
-            .then((response)=>
+            .then(({ body })=>
             {
-                expect(response.res.statusMessage).toBe('Not Found');
+                expect(body.message).toBe('Path Not Found');
             });
         });
     });
@@ -143,9 +142,9 @@ describe('GET /api/reviews', () =>
             return request(app)
             .get('/api/review')
             .expect(404)
-            .then((response)=>
+            .then(({ body })=>
             {
-                expect(response.res.statusMessage).toBe('Not Found');
+                expect(body.message).toBe('Path Not Found');
             });
         });
 
@@ -162,4 +161,76 @@ describe('GET /api/reviews', () =>
             });
         });
     });
-})
+});
+
+describe('GET /api/reviews/:review_id', () =>
+{
+    test('server responds with 200 status code', () =>
+    {
+        return request(app)
+        .get('/api/reviews/5')
+        .expect(200);
+    });
+    test('server responds with a review object for given review_id', () =>
+    {
+        return request(app)
+        .get('/api/reviews/5')
+        .then((response) =>
+        {
+            const { review } = response.body;
+
+            expect(review).toHaveLength(1);
+
+            //checking the review_id
+            expect(review[0].review_id).toBe(5);
+
+            //checking all the properties
+            expect(review[0]).toHaveProperty('owner');
+            expect(review[0]).toHaveProperty('title');
+            expect(review[0]).toHaveProperty('review_id');
+            expect(review[0]).toHaveProperty('category');
+            expect(review[0]).toHaveProperty('review_img_url');
+            expect(review[0]).toHaveProperty('created_at');
+            expect(review[0]).toHaveProperty('votes');
+            expect(review[0]).toHaveProperty('designer');
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('server responds with 404 status code for incorrect review_id', () =>
+        {
+            return request(app)
+            .get('/api/reviews/100')
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('review_id not found!');
+            });
+        });
+
+        test('server responds with 400 status code for bad request made', () =>
+        {
+            return request(app)
+            .get('/api/reviews/games')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('server responds with 404 status code for incorrect path name', () =>
+        {
+            return request(app)
+            .get('/api/review/3')
+            .expect(404)
+            .then(({ body }) =>
+            {
+                expect(body.message).toBe('Path Not Found');
+            });
+        });
+    });
+});
