@@ -47,7 +47,7 @@ const fetchReviewById = (reviewId) =>
     } 
 
     else
-        return Promise.reject({status: 400, message: 'Bad request!'});
+        return Promise.reject({status: 400, message: 'Invalid input!'});
     
 }
 module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById };

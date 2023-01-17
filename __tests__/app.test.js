@@ -4,7 +4,6 @@ const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data/index');
 const db = require('../db/connection');
 
-
 beforeEach(()=>
 {
     return seed(testData);
@@ -65,9 +64,9 @@ describe('GET /api/categories', () =>
             return request(app)
             .get('/api/category')
             .expect(404)
-            .then((response)=>
+            .then(({ body })=>
             {
-                expect(response.res.statusMessage).toBe('Not Found');
+                expect(body.message).toBe('Path Not Found');
             });
         });
     });
@@ -143,9 +142,9 @@ describe('GET /api/reviews', () =>
             return request(app)
             .get('/api/review')
             .expect(404)
-            .then((response)=>
+            .then(({ body })=>
             {
-                expect(response.res.statusMessage).toBe('Not Found');
+                expect(body.message).toBe('Path Not Found');
             });
         });
 
@@ -180,7 +179,7 @@ describe('GET /api/reviews/:review_id', () =>
         {
             const { review } = response.body;
 
-            expect(review.length).toBeGreaterThan(0);
+            expect(review).toHaveLength(1);
 
             //checking the review_id
             expect(review[0].review_id).toBe(5);
@@ -219,7 +218,7 @@ describe('GET /api/reviews/:review_id', () =>
             .then((response) =>
             {
                 const { message } = response.body;
-                expect(message).toBe('Bad request!');
+                expect(message).toBe('Invalid input!');
             });
         });
 
@@ -228,9 +227,9 @@ describe('GET /api/reviews/:review_id', () =>
             return request(app)
             .get('/api/review/3')
             .expect(404)
-            .then((response) =>
+            .then(({ body }) =>
             {
-                expect(response.res.statusMessage).toBe('Not Found');
+                expect(body.message).toBe('Path Not Found');
             });
         });
     });
