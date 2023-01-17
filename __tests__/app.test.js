@@ -234,3 +234,115 @@ describe('GET /api/reviews/:review_id', () =>
         });
     });
 });
+
+describe('PATCH /api/reviews/:review_id', () =>
+{
+    test('server responds with status - 200 and an updated review object for given positive number', () =>
+    {
+        return request(app)
+        .patch('/api/reviews/1')
+        .send({
+            inc_votes: 1
+        })
+        .expect(200)
+        .then((response) => 
+        {
+            const { review } = response.body;
+
+            expect(review[0].votes).toBe(2);
+        });
+    });
+
+    test('server responds with  with status - 200 and an updated review object for given negative number', () =>
+    {
+        return request(app)
+        .patch('/api/reviews/9')
+        .send({
+            inc_votes: -3
+        })
+        .expect(200)
+        .then((response) => 
+        {
+            const { review } = response.body;
+
+            expect(review[0].votes).toBe(7);
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('404 - incorrect review_id provided', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/15')
+            .send({
+                inc_votes: -3
+            })
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('review_id not found!');
+            });
+
+        });
+
+        test('400 - incorrect data type for review_id provided', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/games')
+            .send({
+                inc_votes: -3
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('400 - incorrect data type for votes to be updated is provided', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/1')
+            .send({
+                inc_votes: 'to be incremented by 1'
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('400 - no request body is provided', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/1')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body is empty!');
+            });
+        });
+
+        test('400 - incorrect key provided in the request body', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/1')
+            .send({
+                update_votes: 3
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body must have inc_votes key!');
+            });
+        });
+    });
+
+});

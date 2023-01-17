@@ -50,4 +50,37 @@ const fetchReviewById = (reviewId) =>
         return Promise.reject({status: 400, message: 'Invalid input!'});
     
 }
-module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById };
+
+const updateVotesById = (reviewId, body) =>
+{
+    
+    if(JSON.stringify(body) === '{}')
+        return Promise.reject({status: 400, message: 'request body is empty!'});
+    else
+    {
+        if(body.hasOwnProperty('inc_votes'))
+        {
+            const updateVotes = body.inc_votes;
+
+            const updateVoteQuery = `
+            UPDATE reviews
+            SET votes = (votes + $1)
+            WHERE review_id = $2
+            RETURNING *;`;
+            
+            return db.query(updateVoteQuery,[updateVotes,reviewId])
+            .then(({ rows, rowCount }) =>
+            {
+                if(rowCount === 0)
+                    return Promise.reject({status: 404, message: 'review_id not found!'});
+                else
+                    return rows;
+            });
+        }
+        else
+            return Promise.reject({status: 400, message: 'request body must have inc_votes key!'});
+    }
+
+}
+
+module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById, updateVotesById };
