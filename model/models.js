@@ -50,4 +50,52 @@ const fetchReviewById = (reviewId) =>
         return Promise.reject({status: 400, message: 'Invalid input!'});
     
 }
-module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById };
+
+const addComment = (reviewId, body) =>
+{
+    if(JSON.stringify(body) === '{}')
+        return Promise.reject({status: 400, message: 'request body is empty!'});
+    else
+    {
+        if(body.hasOwnProperty('username') && body.hasOwnProperty('body'))
+        {
+            const author = body.username;
+            const commentBody = body.body;
+            
+            return db.query(`SELECT review_id FROM reviews WHERE review_id = $1;`,[reviewId])
+            .then(({ rowCount }) => 
+            {
+                if(rowCount === 0)
+                    return Promise.reject({status: 404, message: 'review_id not found!'});
+                else
+                {
+                    return db.query(`SELECT username FROM users WHERE username = $1;`,[author])
+                    .then(({ rowCount }) =>
+                    {
+                        if(rowCount === 0)
+                            return Promise.reject({status: 404, message: 'username not found!'});
+                        else
+                        {
+                            const insertCommentQuery = 
+                            `INSERT INTO comments
+                            (body,review_id,author)
+                            VALUES
+                            ($1, $2, $3)
+                            RETURNING *;`;
+                        
+                            return db.query(insertCommentQuery,[commentBody,reviewId,author])
+                            .then(({ rows }) =>
+                            {
+                                return rows;
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        else
+            return Promise.reject({status: 400, message: 'request body is missing keys of username & body!'});
+    }
+}
+
+module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById, addComment };

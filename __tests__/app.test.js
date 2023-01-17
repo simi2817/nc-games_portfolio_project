@@ -234,3 +234,120 @@ describe('GET /api/reviews/:review_id', () =>
         });
     });
 });
+
+describe('POST /api/reviews/:review_id/comments', () =>
+{
+    test('server responds with status code 201', () =>
+    {
+        return request(app)
+        .post('/api/reviews/1/comments')
+        .send({
+            username: 'bainesface',
+            body: 'Fantastic game ever!'
+        })
+        .expect(201);
+    });
+
+    test('server responds with new comment added', () =>
+    {
+        return request(app)
+        .post('/api/reviews/1/comments')
+        .send({
+            username: 'bainesface',
+            body: 'Fantastic game ever!'
+        })
+        .then((response) =>
+        {
+            const { comment } = response.body;
+            
+            expect(comment).toHaveLength(1);
+
+            //checking if the comment_id has been incremented
+            expect(comment[0].comment_id).toBe(7);
+
+            //checking the added values
+            expect(comment[0].review_id).toBe(1);
+            expect(comment[0].body).toBe('Fantastic game ever!');
+            expect(comment[0].author).toBe('bainesface');
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('server responds with 404 status code for incorrect review_id not present in reviews table', () =>
+        {
+            return request(app)
+            .post('/api/reviews/14/comments')
+            .send({
+                username: 'bainesface',
+                body: 'Fantastic game ever!'
+            })
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('review_id not found!');
+            });
+        });
+
+        test('server responds with 400 status code for bad review_id inputs', () =>
+        {
+            return request(app)
+            .post('/api/reviews/games/comments')
+            .send({
+                username: 'bainesface',
+                body: 'Fantastic game ever!'
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('server responds with 400 status code if no body is provided', () =>
+        {
+            return request(app)
+            .post('/api/reviews/1/comments')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body is empty!');
+            });
+        });
+
+        test('server responds with 400 status code if keys are incorrect in request body', () =>
+        {
+            return request(app)
+            .post('/api/reviews/1/comments')
+            .expect(400)
+            .send({
+                name: 'bainesface',
+                description: 'Fantastic game ever!'
+            })
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body is missing keys of username & body!');
+            });
+        });
+
+        test('server responds with 404 status code for incorrect username not present in users table', () =>
+        {
+            return request(app)
+            .post('/api/reviews/1/comments')
+            .send({
+                username: 'silverfox',
+                body: 'Fantastic game ever!'
+            })
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('username not found!');
+            });
+        });
+    });
+});
