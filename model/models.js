@@ -50,4 +50,26 @@ const fetchReviewById = (reviewId) =>
         return Promise.reject({status: 400, message: 'Invalid input!'});
     
 }
-module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById };
+
+const fetchCommentByReviewId = (reviewId) =>
+{
+    const selectCommentByReviewId = 
+    `SELECT * FROM comments
+    WHERE review_id = $1
+    ORDER BY created_at DESC;`;
+
+    return db.query(selectCommentByReviewId, [reviewId])
+    .then(({ rows, rowCount }) =>
+    {
+        if(rowCount === 0)
+            return Promise.reject({status: 404, message: 'review_id not found!'});
+        else
+            return rows;
+    });
+}
+
+module.exports = { 
+    fetchAllCategories, 
+    fetchAllReviews, 
+    fetchReviewById,
+    fetchCommentByReviewId };

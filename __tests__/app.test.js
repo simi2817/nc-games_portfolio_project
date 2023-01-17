@@ -234,3 +234,92 @@ describe('GET /api/reviews/:review_id', () =>
         });
     });
 });
+
+describe('GET /api/reviews/:review_id/comments', () =>
+{
+    test('server responds with 200 status code', () =>
+    {
+        return request(app)
+        .get('/api/reviews/2/comments')
+        .expect(200);
+    });
+
+    test('server responds with an array of comment objects for given review_id', () =>
+    {
+        return request(app)
+        .get('/api/reviews/3/comments')
+        .then((response) =>
+        {
+            const { comments } = response.body;
+
+            expect(comments).toHaveLength(3);
+
+            for(let comment of comments)
+            {
+                expect(comment.review_id).toBe(3);
+
+                expect(comment).toHaveProperty('comment_id');
+                expect(comment).toHaveProperty('votes');
+                expect(comment).toHaveProperty('created_at');
+                expect(comment).toHaveProperty('author');
+                expect(comment).toHaveProperty('body');
+            }
+        });
+    });
+
+    test('server responds with an array of comment objects sorted by recent comments', () =>
+    {
+        return request(app)
+        .get('/api/reviews/3/comments')
+        .then((response) =>
+        {
+            const { comments } = response.body;
+
+            expect(comments[0].created_at.includes('2021-03-27')).toBe(true);
+            expect(comments).toBeSorted({key: 'created_at',
+                descending: true});
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('server responds with 404 status code for incorrect review_id', () =>
+        {
+            return request(app)
+            .get('/api/reviews/100/comments')
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('review_id not found!');
+            });
+        });
+
+        test('server responds with 400 status code for bad request made', () =>
+        {
+            return request(app)
+            .get('/api/reviews/supermario/comments')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('to check if the responded comment objects are sorted according to recent comments', () =>
+        {
+            return request(app)
+            .get('/api/reviews/2/comments')
+            .then((response)=>
+            {
+                const { comments } = response.body;
+
+                expect(comments[0].created_at.includes('2017-11-22')).toBe(false);
+
+                expect(comments).toBeSorted({key: 'created_at',
+                    descending: true});
+            });
+        });
+    })
+});
