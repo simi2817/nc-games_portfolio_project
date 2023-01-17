@@ -1,4 +1,4 @@
-const { fetchAllCategories, fetchAllReviews, fetchReviewById, addComment } = require('../model/models');
+const { fetchAllCategories, fetchAllReviews, fetchReviewById, addComment, fetchReviewsById } = require('../model/models');
 
 const getCategories = (request, response) =>
 {
@@ -36,13 +36,12 @@ const getReviewsById = (request, response, next) =>
 const postComment = (request, response, next) =>
 {
     const { body } = request;
-    
     const reviewId = request.params.review_id;
     
-    addComment(reviewId, body)
+    Promise.all([fetchReviewsById(reviewId), addComment(reviewId, body)])
     .then((newComment) =>
-    {
-        response.status(201).send({'comment': newComment});
+    {   
+        response.status(201).send({'comment': newComment[1]});
     })
     .catch((error) =>
     {

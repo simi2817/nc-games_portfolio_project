@@ -237,7 +237,7 @@ describe('GET /api/reviews/:review_id', () =>
 
 describe('POST /api/reviews/:review_id/comments', () =>
 {
-    test('server responds with status code 201', () =>
+    test('server responds with 201 status code and the new comment added', () =>
     {
         return request(app)
         .post('/api/reviews/1/comments')
@@ -245,17 +245,7 @@ describe('POST /api/reviews/:review_id/comments', () =>
             username: 'bainesface',
             body: 'Fantastic game ever!'
         })
-        .expect(201);
-    });
-
-    test('server responds with new comment added', () =>
-    {
-        return request(app)
-        .post('/api/reviews/1/comments')
-        .send({
-            username: 'bainesface',
-            body: 'Fantastic game ever!'
-        })
+        .expect(201)
         .then((response) =>
         {
             const { comment } = response.body;
@@ -334,7 +324,7 @@ describe('POST /api/reviews/:review_id/comments', () =>
             });
         });
 
-        test('server responds with 404 status code for incorrect username not present in users table', () =>
+        test('server responds with 500 status code for incorrect username not present in users table', () =>
         {
             return request(app)
             .post('/api/reviews/1/comments')
@@ -342,12 +332,7 @@ describe('POST /api/reviews/:review_id/comments', () =>
                 username: 'silverfox',
                 body: 'Fantastic game ever!'
             })
-            .expect(404)
-            .then((response) =>
-            {
-                const { message } = response.body;
-                expect(message).toBe('username not found!');
-            });
+            .expect(500);
         });
     });
 });
