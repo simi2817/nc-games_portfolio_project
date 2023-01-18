@@ -4,7 +4,8 @@ const {
     fetchReviewById,
     fetchCommentByReviewId,
     addComment, 
-    fetchReviewsById
+    fetchReviewsById,
+    updateVotesById
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -71,9 +72,27 @@ const postComment = (request, response, next) =>
     })
 }
 
+const patchVotesById = (request, response, next) =>
+{
+    const reviewId = request.params.review_id;
+    const { body } = request;
+
+    updateVotesById(reviewId, body)
+    .then((updatedReview) => 
+    {
+        response.status(200).send({'review': updatedReview});
+    })
+    .catch((error) => 
+    {
+        next(error);
+    })
+}
+
 module.exports = { 
     getCategories,
     getReviews,
     getReviewsById,
     getCommentsByReviewId,
-    postComment };
+    postComment,
+    patchVotesById
+    };
