@@ -16,10 +16,6 @@ app.get('/api/reviews/:review_id', getReviewsById);
 
 app.post('/api/reviews/:review_id/comments', postComment);
 
-
-
-
-
 app.get('/api/users', getUsers);
 
 app.use(handleCustomErrors);

@@ -55,18 +55,17 @@ const postComment = (request, response, next) =>
     })
 }
 
-
-
-
-
-
-const getUsers = (request, response) =>
+const getUsers = (request, response, next) =>
 {
     fetchAllUsers()
     .then((users) =>
     {
         response.status(200).send({'users': users});
     })
+    .catch((error) =>
+    {
+        next(error);
+    });
 }
 
 module.exports = { 

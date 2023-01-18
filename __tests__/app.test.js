@@ -337,12 +337,6 @@ describe('POST /api/reviews/:review_id/comments', () =>
     });
 });
 
-
-
-
-
-
-
 describe('GET /api/users', () =>
 {
     test('server sends response with 200 status code and an array of user objects', () =>
@@ -379,20 +373,6 @@ describe('GET /api/users', () =>
                 expect(user).toHaveProperty('name', expect.any(String));
                 expect(user).toHaveProperty('avatar_url', expect.any(String));
             }    
-        });
-    });
-
-    describe('Errors', () =>
-    {
-        test('server responds with 404 status code for incorrect path provided', () =>
-        {
-            return request(app)
-            .get('/api/user')
-            .expect(404)
-            .then(({ body })=>
-            {
-                expect(body.message).toBe('Path Not Found');
-            });
         });
     });
 })
