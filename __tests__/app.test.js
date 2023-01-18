@@ -550,3 +550,38 @@ describe('GET /api/users', () =>
         });
     });
 });
+
+
+describe('GET /api/reviews/:review_id (comment_count)', () =>
+{
+    test('server responds with 200 OK and a review response object with comment_count property', () =>
+    {
+        return request(app)
+        .get('/api/reviews/3')
+        .expect(200)
+        .then((response) =>
+        {
+            const { review } = response.body;
+
+            expect(review).toHaveLength(1);
+
+            expect(review[0]).toHaveProperty('comment_count');
+            expect(parseInt(review[0].comment_count)).toBe(3);
+        });
+    });
+
+    test('server responds with comment_count = 0, if no comments are present in comments table', () =>
+    {
+        return request(app)
+        .get('/api/reviews/5')
+        .expect(200)
+        .then((response) =>
+        {
+            const { review } = response.body;
+
+            expect(review).toHaveLength(1);
+
+            expect(parseInt(review[0].comment_count)).toBe(0);
+        });
+    });
+});

@@ -4,7 +4,7 @@ const {
     fetchReviewById,
     fetchCommentByReviewId,
     addComment, 
-    fetchReviewsById,
+    validateReviewId,
     updateVotesById,
     fetchAllUsers
     } = require('../model/models');
@@ -31,10 +31,10 @@ const getReviewsById = (request, response, next) =>
 {
     const reviewId = request.params.review_id;
 
-    fetchReviewById(reviewId)
+    Promise.all([validateReviewId(reviewId),fetchReviewById(reviewId)])
     .then((review) =>
     {
-        response.status(200).send({'review': review});
+        response.status(200).send({'review': review[1]});
     })
     .catch((error) =>
     {
@@ -62,7 +62,7 @@ const postComment = (request, response, next) =>
     const { body } = request;
     const reviewId = request.params.review_id;
     
-    Promise.all([fetchReviewsById(reviewId), addComment(reviewId, body)])
+    Promise.all([validateReviewId(reviewId), addComment(reviewId, body)])
     .then((newComment) =>
     {   
         response.status(201).send({'comment': newComment[1]});
