@@ -6,7 +6,8 @@ const {
     getReviewsById,
     getCommentsByReviewId,
     postComment,
-    patchVotesById
+    patchVotesById,
+    getUsers
     } = require('../controller/controllers');
 
 const { handleCustomErrors, handlePsqlErrors, handleServerErrors, handlePathNotFoundErrors } = require('../errors/index');
@@ -26,6 +27,8 @@ app.get('/api/reviews/:review_id/comments', getCommentsByReviewId);
 app.post('/api/reviews/:review_id/comments', postComment);
 
 app.patch('/api/reviews/:review_id', patchVotesById);
+
+app.get('/api/users', getUsers);
 
 app.use(handleCustomErrors);
 

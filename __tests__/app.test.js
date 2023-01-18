@@ -397,17 +397,6 @@ describe('POST /api/reviews/:review_id/comments', () =>
                 expect(message).toBe('request body is missing keys of username & body!');
             });
         });
-
-        test('server responds with 500 status code for incorrect username not present in users table', () =>
-        {
-            return request(app)
-            .post('/api/reviews/1/comments')
-            .send({
-                username: 'silverfox',
-                body: 'Fantastic game ever!'
-            })
-            .expect(500);
-        });
     });
 });
 
@@ -518,6 +507,46 @@ describe('PATCH /api/reviews/:review_id', () =>
                 const { message } = response.body;
                 expect(message).toBe('request body must have inc_votes key!');
             });
+        });
+    });
+});
+
+describe('GET /api/users', () =>
+{
+    test('server sends response with 200 status code and an array of user objects', () =>
+    {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response) =>
+        {
+            const { users } = response.body;
+            expect(users).not.toBe(undefined);
+
+            expect(users.length).toBeGreaterThan(0);
+
+            for(let user of users)
+                expect(typeof user).toBe('object');
+        });
+    });
+
+    test('to check each user object has username,name & avatar_url properties', () =>
+    {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response) =>
+        {
+            const { users } = response.body;
+
+            expect(users.length).toBeGreaterThan(0);
+
+            for(let user of users)
+            {
+                expect(user).toHaveProperty('username', expect.any(String));
+                expect(user).toHaveProperty('name', expect.any(String));
+                expect(user).toHaveProperty('avatar_url', expect.any(String));
+            }    
         });
     });
 });

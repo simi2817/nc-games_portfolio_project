@@ -146,6 +146,16 @@ const updateVotesById = (reviewId, body) =>
     }
 }
 
+const fetchAllUsers = () =>
+{
+    const selectUsersQuery = `SELECT * FROM users;`;
+
+    return db.query(selectUsersQuery)
+    .then(({ rows }) =>
+    {
+        return rows;
+    });
+}
 
 module.exports = { 
     fetchAllCategories,
@@ -154,5 +164,6 @@ module.exports = {
     fetchCommentByReviewId,
     addComment,
     fetchReviewsById,
-    updateVotesById
+    updateVotesById,
+    fetchAllUsers
     };
