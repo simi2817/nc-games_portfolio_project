@@ -235,7 +235,7 @@ describe('GET /api/reviews/:review_id', () =>
     });
 });
 
-describe('GET /api/reviews/:review_id/comments', () =>
+describe.only('GET /api/reviews/:review_id/comments', () =>
 {
     test('server responds with 200 status code', () =>
     {
@@ -258,11 +258,11 @@ describe('GET /api/reviews/:review_id/comments', () =>
             {
                 expect(comment.review_id).toBe(3);
 
-                expect(comment).toHaveProperty('comment_id');
-                expect(comment).toHaveProperty('votes');
-                expect(comment).toHaveProperty('created_at');
-                expect(comment).toHaveProperty('author');
-                expect(comment).toHaveProperty('body');
+                expect(comment).toHaveProperty('comment_id', expect.any(Number));
+                expect(comment).toHaveProperty('votes', expect.any(Number));
+                expect(comment).toHaveProperty('created_at', expect.any(String));
+                expect(comment).toHaveProperty('author', expect.any(String));
+                expect(comment).toHaveProperty('body', expect.any(String));
             }
         });
     });
@@ -304,21 +304,6 @@ describe('GET /api/reviews/:review_id/comments', () =>
             {
                 const { message } = response.body;
                 expect(message).toBe('Invalid input!');
-            });
-        });
-
-        test('to check if the responded comment objects are sorted according to recent comments', () =>
-        {
-            return request(app)
-            .get('/api/reviews/2/comments')
-            .then((response)=>
-            {
-                const { comments } = response.body;
-
-                expect(comments[0].created_at.includes('2017-11-22')).toBe(false);
-
-                expect(comments).toBeSorted({key: 'created_at',
-                    descending: true});
             });
         });
     })

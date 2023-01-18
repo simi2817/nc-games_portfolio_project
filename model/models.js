@@ -58,14 +58,20 @@ const fetchCommentByReviewId = (reviewId) =>
     WHERE review_id = $1
     ORDER BY created_at DESC;`;
 
-    return db.query(selectCommentByReviewId, [reviewId])
-    .then(({ rows, rowCount }) =>
+    return db.query(`SELECT review_id FROM reviews WHERE review_id = $1;`,[reviewId])
+    .then(({ rowCount }) =>
     {
         if(rowCount === 0)
             return Promise.reject({status: 404, message: 'review_id not found!'});
         else
-            return rows;
-    });
+        {
+            return db.query(selectCommentByReviewId, [reviewId])
+            .then(({ rows, rowCount }) =>
+            {
+                return rows;
+            });
+        }
+    })
 }
 
 module.exports = { 
