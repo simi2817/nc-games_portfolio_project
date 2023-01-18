@@ -1,8 +1,11 @@
 const { 
-    fetchAllCategories, 
-    fetchAllReviews, 
-    fetchReviewById, 
-    fetchCommentByReviewId } = require('../model/models');
+    fetchAllCategories,
+    fetchAllReviews,
+    fetchReviewById,
+    fetchCommentByReviewId,
+    addComment, 
+    fetchReviewsById
+    } = require('../model/models');
 
 const getCategories = (request, response) =>
 {
@@ -52,8 +55,25 @@ const getCommentsByReviewId = (request, response, next) =>
     })
 }
 
+const postComment = (request, response, next) =>
+{
+    const { body } = request;
+    const reviewId = request.params.review_id;
+    
+    Promise.all([fetchReviewsById(reviewId), addComment(reviewId, body)])
+    .then((newComment) =>
+    {   
+        response.status(201).send({'comment': newComment[1]});
+    })
+    .catch((error) =>
+    {
+        next(error);
+    })
+}
+
 module.exports = { 
-    getCategories, 
-    getReviews, 
-    getReviewsById, 
-    getCommentsByReviewId };
+    getCategories,
+    getReviews,
+    getReviewsById,
+    getCommentsByReviewId,
+    postComment };

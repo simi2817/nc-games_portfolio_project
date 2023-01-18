@@ -74,8 +74,52 @@ const fetchCommentByReviewId = (reviewId) =>
     })
 }
 
+const addComment = (reviewId, body) =>
+{
+    if(JSON.stringify(body) === '{}')
+        return Promise.reject({status: 400, message: 'request body is empty!'});
+    else
+    {
+        if(body.hasOwnProperty('username') && body.hasOwnProperty('body'))
+        {
+            const author = body.username;
+            const commentBody = body.body;
+            
+            const insertCommentQuery = 
+            `INSERT INTO comments (body,review_id,author)
+            VALUES ($1, $2, $3)
+            RETURNING *;`;
+                        
+            return db.query(insertCommentQuery,[commentBody,reviewId,author])
+            .then(({ rows }) =>
+            {
+                return rows;
+            });
+        }
+        else
+            return Promise.reject({status: 400, message: 'request body is missing keys of username & body!'});
+    }
+}
+        
+const fetchReviewsById = (reviewId) =>
+{
+    const selectReviewQuery = `SELECT review_id FROM reviews WHERE review_id = $1;`;
+
+    return db.query(selectReviewQuery,[reviewId])
+    .then(({ rowCount, rows }) =>
+    {
+        if(rowCount === 0)
+        return Promise.reject({status: 404, message: 'review_id not found!'});
+        else
+            return rows[0];
+    });
+}
+
 module.exports = { 
-    fetchAllCategories, 
-    fetchAllReviews, 
+    fetchAllCategories,
+    fetchAllReviews,
     fetchReviewById,
-    fetchCommentByReviewId };
+    fetchCommentByReviewId,
+    addComment,
+    fetchReviewsById
+    };
