@@ -375,9 +375,9 @@ describe('GET /api/users', () =>
 
             for(let user of users)
             {
-                expect(user).toHaveProperty('username');
-                expect(user).toHaveProperty('name');
-                expect(user).toHaveProperty('avatar_url');
+                expect(user).toHaveProperty('username', expect.any(String));
+                expect(user).toHaveProperty('name', expect.any(String));
+                expect(user).toHaveProperty('avatar_url', expect.any(String));
             }    
         });
     });
