@@ -235,6 +235,80 @@ describe('GET /api/reviews/:review_id', () =>
     });
 });
 
+describe('GET /api/reviews/:review_id/comments', () =>
+{
+    test('server responds with 200 status code', () =>
+    {
+        return request(app)
+        .get('/api/reviews/2/comments')
+        .expect(200);
+    });
+
+    test('server responds with an array of comment objects for given review_id', () =>
+    {
+        return request(app)
+        .get('/api/reviews/3/comments')
+        .then((response) =>
+        {
+            const { comments } = response.body;
+
+            expect(comments).toHaveLength(3);
+
+            for(let comment of comments)
+            {
+                expect(comment.review_id).toBe(3);
+
+                expect(comment).toHaveProperty('comment_id', expect.any(Number));
+                expect(comment).toHaveProperty('votes', expect.any(Number));
+                expect(comment).toHaveProperty('created_at', expect.any(String));
+                expect(comment).toHaveProperty('author', expect.any(String));
+                expect(comment).toHaveProperty('body', expect.any(String));
+            }
+        });
+    });
+
+    test('server responds with an array of comment objects sorted by recent comments', () =>
+    {
+        return request(app)
+        .get('/api/reviews/3/comments')
+        .then((response) =>
+        {
+            const { comments } = response.body;
+
+            expect(comments[0].created_at.includes('2021-03-27')).toBe(true);
+            expect(comments).toBeSorted({key: 'created_at',
+                descending: true});
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('server responds with 404 status code for incorrect review_id', () =>
+        {
+            return request(app)
+            .get('/api/reviews/100/comments')
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('review_id not found!');
+            });
+        });
+
+        test('server responds with 400 status code for bad request made', () =>
+        {
+            return request(app)
+            .get('/api/reviews/supermario/comments')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+    });
+});
+
 describe('POST /api/reviews/:review_id/comments', () =>
 {
     test('server responds with 201 status code and the new comment added', () =>
@@ -323,16 +397,116 @@ describe('POST /api/reviews/:review_id/comments', () =>
                 expect(message).toBe('request body is missing keys of username & body!');
             });
         });
+    });
+});
 
-        test('server responds with 500 status code for incorrect username not present in users table', () =>
+describe('PATCH /api/reviews/:review_id', () =>
+{
+    test('server responds with status - 200 and an updated review object for given positive number', () =>
+    {
+        return request(app)
+        .patch('/api/reviews/1')
+        .send({
+            inc_votes: 1
+        })
+        .expect(200)
+        .then((response) => 
+        {
+            const { review } = response.body;
+
+            expect(review.votes).toBe(2);
+        });
+    });
+
+    test('server responds with  with status - 200 and an updated review object for given negative number', () =>
+    {
+        return request(app)
+        .patch('/api/reviews/9')
+        .send({
+            inc_votes: -3
+        })
+        .expect(200)
+        .then((response) => 
+        {
+            const { review } = response.body;
+
+            expect(review.votes).toBe(7);
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('404 - incorrect review_id provided', () =>
         {
             return request(app)
-            .post('/api/reviews/1/comments')
+            .patch('/api/reviews/15')
             .send({
-                username: 'silverfox',
-                body: 'Fantastic game ever!'
+                inc_votes: -3
             })
-            .expect(500);
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('review_id not found!');
+            });
+
+        });
+
+        test('400 - incorrect data type for review_id provided', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/games')
+            .send({
+                inc_votes: -3
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('400 - incorrect data type for votes to be updated is provided', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/1')
+            .send({
+                inc_votes: 'to be incremented by 1'
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('400 - no request body is provided', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/1')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body is empty!');
+            });
+        });
+
+        test('400 - incorrect key provided in the request body', () =>
+        {
+            return request(app)
+            .patch('/api/reviews/1')
+            .send({
+                update_votes: 3
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body must have inc_votes key!');
+            });
         });
     });
 });
@@ -375,4 +549,4 @@ describe('GET /api/users', () =>
             }    
         });
     });
-})
+});

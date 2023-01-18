@@ -1,10 +1,13 @@
 const { 
-    fetchAllCategories, 
-    fetchAllReviews, 
-    fetchReviewById, 
+    fetchAllCategories,
+    fetchAllReviews,
+    fetchReviewById,
+    fetchCommentByReviewId,
     addComment, 
     fetchReviewsById,
-    fetchAllUsers } = require('../model/models');
+    updateVotesById,
+    fetchAllUsers
+    } = require('../model/models');
 
 const getCategories = (request, response) =>
 {
@@ -39,6 +42,21 @@ const getReviewsById = (request, response, next) =>
     })
 }
 
+const getCommentsByReviewId = (request, response, next) =>
+{
+    const reviewId = request.params.review_id;
+
+    fetchCommentByReviewId(reviewId)
+    .then((comments) =>
+    {
+        response.status(200).send({'comments': comments});
+    })
+    .catch((error) =>
+    {
+        next(error);
+    })
+}
+
 const postComment = (request, response, next) =>
 {
     const { body } = request;
@@ -50,6 +68,22 @@ const postComment = (request, response, next) =>
         response.status(201).send({'comment': newComment[1]});
     })
     .catch((error) =>
+    {
+        next(error);
+    })
+}
+
+const patchVotesById = (request, response, next) =>
+{
+    const reviewId = request.params.review_id;
+    const { body } = request;
+
+    updateVotesById(reviewId, body)
+    .then((updatedReview) => 
+    {
+        response.status(200).send({'review': updatedReview});
+    })
+    .catch((error) => 
     {
         next(error);
     })
@@ -69,8 +103,11 @@ const getUsers = (request, response, next) =>
 }
 
 module.exports = { 
-    getCategories, 
-    getReviews, 
-    getReviewsById, 
-    postComment, 
-    getUsers };
+    getCategories,
+    getReviews,
+    getReviewsById,
+    getCommentsByReviewId,
+    postComment,
+    patchVotesById,
+    getUsers
+    };
