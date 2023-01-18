@@ -1,4 +1,10 @@
-const { fetchAllCategories, fetchAllReviews, fetchReviewById, addComment, fetchReviewsById } = require('../model/models');
+const { 
+    fetchAllCategories, 
+    fetchAllReviews, 
+    fetchReviewById, 
+    addComment, 
+    fetchReviewsById,
+    fetchAllUsers } = require('../model/models');
 
 const getCategories = (request, response) =>
 {
@@ -49,4 +55,23 @@ const postComment = (request, response, next) =>
     })
 }
 
-module.exports = { getCategories, getReviews, getReviewsById, postComment };
+
+
+
+
+
+const getUsers = (request, response) =>
+{
+    fetchAllUsers()
+    .then((users) =>
+    {
+        response.status(200).send({'users': users});
+    })
+}
+
+module.exports = { 
+    getCategories, 
+    getReviews, 
+    getReviewsById, 
+    postComment, 
+    getUsers };

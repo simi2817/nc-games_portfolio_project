@@ -336,3 +336,63 @@ describe('POST /api/reviews/:review_id/comments', () =>
         });
     });
 });
+
+
+
+
+
+
+
+describe('GET /api/users', () =>
+{
+    test('server sends response with 200 status code and an array of user objects', () =>
+    {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response) =>
+        {
+            const { users } = response.body;
+            expect(users).not.toBe(undefined);
+
+            expect(users.length).toBeGreaterThan(0);
+
+            for(let user of users)
+                expect(typeof user).toBe('object');
+        });
+    });
+
+    test('to check each user object has username,name & avatar_url properties', () =>
+    {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then((response) =>
+        {
+            const { users } = response.body;
+
+            expect(users.length).toBeGreaterThan(0);
+
+            for(let user of users)
+            {
+                expect(user).toHaveProperty('username');
+                expect(user).toHaveProperty('name');
+                expect(user).toHaveProperty('avatar_url');
+            }    
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('server responds with 404 status code for incorrect path provided', () =>
+        {
+            return request(app)
+            .get('/api/user')
+            .expect(404)
+            .then(({ body })=>
+            {
+                expect(body.message).toBe('Path Not Found');
+            });
+        });
+    });
+})

@@ -92,4 +92,25 @@ const fetchReviewsById = (reviewId) =>
     });
 }
 
-module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById, addComment, fetchReviewsById};
+
+
+
+const fetchAllUsers = () =>
+{
+    const selectUsersQuery = `SELECT * FROM users;`;
+
+    return db.query(selectUsersQuery)
+    .then(({ rows }) =>
+    {
+        return rows;
+    });
+}
+
+module.exports = { 
+    fetchAllCategories, 
+    fetchAllReviews, 
+    fetchReviewById, 
+    addComment, 
+    fetchReviewsById,
+    fetchAllUsers
+    };
