@@ -249,7 +249,7 @@ describe('PATCH /api/reviews/:review_id', () =>
         {
             const { review } = response.body;
 
-            expect(review[0].votes).toBe(2);
+            expect(review.votes).toBe(2);
         });
     });
 
@@ -265,7 +265,7 @@ describe('PATCH /api/reviews/:review_id', () =>
         {
             const { review } = response.body;
 
-            expect(review[0].votes).toBe(7);
+            expect(review.votes).toBe(7);
         });
     });
 

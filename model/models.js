@@ -74,7 +74,7 @@ const updateVotesById = (reviewId, body) =>
                 if(rowCount === 0)
                     return Promise.reject({status: 404, message: 'review_id not found!'});
                 else
-                    return rows;
+                    return rows[0];
             });
         }
         else
