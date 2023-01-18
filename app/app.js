@@ -1,6 +1,13 @@
 const express = require('express');
 
-const { getCategories, getReviews, getReviewsById, patchVotesById } = require('../controller/controllers');
+const { 
+    getCategories, 
+    getReviews, 
+    getReviewsById,
+    getCommentsByReviewId,
+    postComment,
+    patchVotesById
+    } = require('../controller/controllers');
 
 const { handleCustomErrors, handlePsqlErrors, handleServerErrors, handlePathNotFoundErrors } = require('../errors/index');
 
@@ -13,6 +20,10 @@ app.get('/api/categories', getCategories);
 app.get('/api/reviews', getReviews);
 
 app.get('/api/reviews/:review_id', getReviewsById);
+
+app.get('/api/reviews/:review_id/comments', getCommentsByReviewId);
+
+app.post('/api/reviews/:review_id/comments', postComment);
 
 app.patch('/api/reviews/:review_id', patchVotesById);
 
