@@ -51,45 +51,31 @@ const fetchReviewById = (reviewId) =>
     
 }
 
-const addComment = (reviewId, body) =>
+const fetchCommentByReviewId = (reviewId) =>
 {
-    if(JSON.stringify(body) === '{}')
-        return Promise.reject({status: 400, message: 'request body is empty!'});
-    else
+    const selectCommentByReviewId = 
+    `SELECT * FROM comments
+    WHERE review_id = $1
+    ORDER BY created_at DESC;`;
+
+    return db.query(`SELECT review_id FROM reviews WHERE review_id = $1;`,[reviewId])
+    .then(({ rowCount }) =>
     {
-        if(body.hasOwnProperty('username') && body.hasOwnProperty('body'))
+        if(rowCount === 0)
+            return Promise.reject({status: 404, message: 'review_id not found!'});
+        else
         {
-            const author = body.username;
-            const commentBody = body.body;
-            
-            const insertCommentQuery = 
-            `INSERT INTO comments (body,review_id,author)
-            VALUES ($1, $2, $3)
-            RETURNING *;`;
-                        
-            return db.query(insertCommentQuery,[commentBody,reviewId,author])
-            .then(({ rows }) =>
+            return db.query(selectCommentByReviewId, [reviewId])
+            .then(({ rows, rowCount }) =>
             {
                 return rows;
             });
         }
-        else
-            return Promise.reject({status: 400, message: 'request body is missing keys of username & body!'});
-    }
-}
-        
-const fetchReviewsById = (reviewId) =>
-{
-    const selectReviewQuery = `SELECT review_id FROM reviews WHERE review_id = $1;`;
-
-    return db.query(selectReviewQuery,[reviewId])
-    .then(({ rowCount, rows }) =>
-    {
-        if(rowCount === 0)
-        return Promise.reject({status: 404, message: 'review_id not found!'});
-        else
-            return rows[0];
-    });
+    })
 }
 
-module.exports = { fetchAllCategories, fetchAllReviews, fetchReviewById, addComment, fetchReviewsById};
+module.exports = { 
+    fetchAllCategories, 
+    fetchAllReviews, 
+    fetchReviewById,
+    fetchCommentByReviewId };
