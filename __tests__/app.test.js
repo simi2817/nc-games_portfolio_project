@@ -550,3 +550,102 @@ describe('GET /api/users', () =>
         });
     });
 });
+
+describe('GET /api/reviews (queries)', () =>
+{
+    test('server responds with review object for a given category', () =>
+    {
+        return request(app)
+        .get('/api/reviews?category=social deduction')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+
+            expect(reviews[0].category).toBe('social deduction');
+        })
+    });
+
+    test('server responds with review object sorted as per given column_name', () =>
+    {
+        return request(app)
+        .get('/api/reviews?sort_by=designer')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+
+            expect(reviews[0].designer).toBe('Leslie Scott');
+            expect(reviews).toBeSorted({key: 'designer',
+            descending: true});
+        })
+    });
+
+    test('server responds with review object ordered in descending order', () =>
+    {
+        return request(app)
+        .get('/api/reviews?order=asc')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews).toBeSorted({key: 'created_at',
+            ascending: true});
+        })
+    });
+
+    test('server responds with review object for a given sort_by and order', () =>
+    {
+        return request(app)
+        .get('/api/reviews?sort_by=title&order=asc')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews[0].title).toBe('Jenga');
+            expect(reviews).toBeSorted({key: 'title',
+            ascending: true});
+        })
+    });
+
+    test('server responds with review object for a given category, sort_by and order', () =>
+    {
+        return request(app)
+        .get('/api/reviews?category=social deduction&sort_by=title&order=asc')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews[0].title).toBe('Ultimate Werewolf');
+            expect(reviews).toBeSorted({key: 'title',
+            ascending: true});
+        })
+    });
+
+    describe('Errors', () =>
+    {
+        test('404 - invalid category value provided', () =>
+        {
+            return request(app)
+            .get('/api/reviews?category=euro game')
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('category not found!');
+            });
+        });
+
+        test('400 - invalid order query provided', () =>
+        {
+            return request(app)
+            .get('/api/reviews?order=abcdef')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid order query!');
+            });
+        });
+    });
+});

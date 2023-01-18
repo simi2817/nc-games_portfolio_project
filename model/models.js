@@ -11,20 +11,66 @@ const fetchAllCategories = () =>
     });
 }
 
-const fetchAllReviews = () =>
+const fetchAllReviews = (query) =>
 {
-    const selectReviewQuery = 
-    `SELECT reviews.*, COUNT(comments.review_id) AS comment_count
+    const queryValues = [];
+    let where = '';
+    let sort = '';
+    let order = '';
+
+    if(query.category)
+    {
+        where = ` WHERE reviews.category = $1 `;
+        queryValues.push(query.category);
+    }
+     
+    if(query.sort_by)
+        sort = `reviews.${query.sort_by}`;
+    else
+        sort = `DATE(reviews.created_at)`;
+
+    if(query.order)
+    {
+        if(query.order === 'asc' || query.order === 'desc')
+            order = `${query.order}`;
+        else
+            return Promise.reject({status: 400, message: 'Invalid order query!'});
+    }
+    else
+        order = `DESC`;
+
+        const selectReviewQuery = 
+        `SELECT reviews.*, COUNT(comments.review_id) AS comment_count
+        FROM reviews
+        JOIN comments
+        ON reviews.review_id = comments.review_id
+        ${where}
+        GROUP BY reviews.review_id
+        ORDER BY ${sort} ${order};`;
+
+        return db.query(selectReviewQuery,queryValues)
+        .then(({ rows })=>
+        {   
+                return rows;
+        });
+}
+
+const fetchCategoryFromReviews = (category) =>
+{
+    const selectCategoryQuery = 
+    `SELECT reviews.category
     FROM reviews
     JOIN comments
     ON reviews.review_id = comments.review_id
-    GROUP BY reviews.review_id
-    ORDER BY DATE(reviews.created_at) DESC;`;
+    WHERE reviews.category = $1;`;
 
-    return db.query(selectReviewQuery)
-    .then(({ rows })=>
+    return db.query(selectCategoryQuery, [category])
+    .then(({ rows, rowCount }) =>
     {
-            return rows;
+        if(rowCount === 0)
+            return Promise.reject({status: 404, message: 'category not found!'});
+        else
+            return rows[0];
     });
 }
 
@@ -165,5 +211,6 @@ module.exports = {
     addComment,
     fetchReviewsById,
     updateVotesById,
-    fetchAllUsers
+    fetchAllUsers,
+    fetchCategoryFromReviews
     };

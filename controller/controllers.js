@@ -6,7 +6,8 @@ const {
     addComment, 
     fetchReviewsById,
     updateVotesById,
-    fetchAllUsers
+    fetchAllUsers,
+    fetchCategoryFromReviews
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -18,13 +19,34 @@ const getCategories = (request, response) =>
     });
 }
 
-const getReviews = (request, response) =>
+const getReviews = (request, response, next) =>
 {
-    fetchAllReviews()
-    .then((reviews) =>
+    const { query } = request;
+
+    if(query.category !== undefined)
     {
-        response.status(200).send({'reviews': reviews});
-    });
+        Promise.all([fetchCategoryFromReviews(query.category), fetchAllReviews(query)])
+        .then((reviews) =>
+        {
+            response.status(200).send({'reviews': reviews[1]});
+        })
+        .catch((error) =>
+        {
+            next(error);
+        });
+    }
+    else
+    {
+        fetchAllReviews(query)
+        .then((reviews) =>
+        {
+            response.status(200).send({'reviews': reviews});
+        })
+        .catch((error) =>
+        {
+            next(error);
+        });
+    }
 }
 
 const getReviewsById = (request, response, next) =>
