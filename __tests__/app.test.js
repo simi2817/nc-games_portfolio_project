@@ -235,7 +235,7 @@ describe('GET /api/reviews/:review_id', () =>
     });
 });
 
-describe.only('GET /api/reviews/:review_id/comments', () =>
+describe('GET /api/reviews/:review_id/comments', () =>
 {
     test('server responds with 200 status code', () =>
     {
@@ -306,5 +306,5 @@ describe.only('GET /api/reviews/:review_id/comments', () =>
                 expect(message).toBe('Invalid input!');
             });
         });
-    })
+    });
 });
