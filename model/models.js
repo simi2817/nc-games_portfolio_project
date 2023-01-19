@@ -254,5 +254,6 @@ module.exports = {
     updateVotesById,
     fetchAllUsers,
     validateCategory,
-    removeCommentById
+    removeCommentById,
+    fetchEndPoints
     };
