@@ -8,7 +8,8 @@ const {
     updateVotesById,
     fetchAllUsers,
     validateCategory,
-    removeCommentById
+    removeCommentById,
+    fetchEndPoints
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -140,6 +141,19 @@ const deleteComment = (request, response, next) =>
     });
 }
 
+const getEndPoints = (request, response, next) =>
+{
+    fetchEndPoints()
+    .then((api) =>
+    {
+        response.status(200).send({api});
+    })
+    .catch((error) =>
+    {
+        next(error);
+    });
+}
+
 module.exports = { 
     getCategories,
     getReviews,
@@ -148,5 +162,6 @@ module.exports = {
     postComment,
     patchVotesById,
     getUsers,
-    deleteComment
+    deleteComment,
+    getEndPoints
     };

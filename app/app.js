@@ -8,7 +8,8 @@ const {
     postComment,
     patchVotesById,
     getUsers,
-    deleteComment
+    deleteComment,
+    getEndPoints
     } = require('../controller/controllers');
 
 const { handleCustomErrors, handlePsqlErrors, handleServerErrors, handlePathNotFoundErrors } = require('../errors/index');
@@ -32,6 +33,8 @@ app.patch('/api/reviews/:review_id', patchVotesById);
 app.get('/api/users', getUsers);
 
 app.delete('/api/comments/:comment_id', deleteComment);
+
+app.get('/api', getEndPoints);
 
 app.use(handleCustomErrors);
 

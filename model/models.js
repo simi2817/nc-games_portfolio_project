@@ -1,4 +1,5 @@
 const db = require('../db/connection');
+const fs = require("fs/promises");
 
 const fetchAllCategories = () =>
 {
@@ -230,6 +231,16 @@ const removeCommentById = (commentId) =>
             return Promise.reject({status: 404, message: 'comment_id not found!'});
         else
             return;
+    });
+}
+
+const fetchEndPoints = () =>
+{
+    return fs
+    .readFile('endpoints.json', 'utf-8')
+    .then((apiList) =>
+    {
+        return JSON.parse(apiList);
     });
 }
 
