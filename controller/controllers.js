@@ -7,7 +7,8 @@ const {
     validateReviewId,
     updateVotesById,
     fetchAllUsers,
-    validateCategory
+    validateCategory,
+    fetchEndPoints
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -124,6 +125,19 @@ const getUsers = (request, response, next) =>
     });
 }
 
+const getEndPoints = (request, response, next) =>
+{
+    fetchEndPoints()
+    .then((api) =>
+    {
+        response.status(200).send({api});
+    })
+    .catch((error) =>
+    {
+        next(error);
+    });
+}
+
 module.exports = { 
     getCategories,
     getReviews,
@@ -131,5 +145,6 @@ module.exports = {
     getCommentsByReviewId,
     postComment,
     patchVotesById,
-    getUsers
+    getUsers,
+    getEndPoints
     };

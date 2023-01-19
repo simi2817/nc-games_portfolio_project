@@ -1,4 +1,5 @@
 const db = require('../db/connection');
+const fs = require("fs/promises");
 
 const fetchAllCategories = () =>
 {
@@ -218,6 +219,16 @@ const fetchAllUsers = () =>
     });
 }
 
+const fetchEndPoints = () =>
+{
+    return fs
+    .readFile('endpoints.json', 'utf-8')
+    .then((apiList) =>
+    {
+        return JSON.parse(apiList);
+    });
+}
+
 module.exports = { 
     fetchAllCategories,
     fetchAllReviews,
@@ -227,5 +238,6 @@ module.exports = {
     validateReviewId,
     updateVotesById,
     fetchAllUsers,
-    validateCategory
+    validateCategory,
+    fetchEndPoints
     };

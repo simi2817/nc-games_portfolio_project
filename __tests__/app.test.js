@@ -698,3 +698,27 @@ describe('GET /api/reviews/:review_id (comment_count)', () =>
         });
     });
 });
+
+describe('GET /api', () =>
+{
+    test('server responds with a list of all api with status code 200', () =>
+    {
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then((response) =>
+        {
+            const { api } = response.body;
+            
+            expect(Object.keys(api).length).toBe(8);
+
+            expect(Object.keys(api).includes('GET /api')).toBe(true);
+            expect(Object.keys(api).includes('GET /api/categories')).toBe(true);
+            expect(Object.keys(api).includes('GET /api/reviews')).toBe(true);
+            expect(Object.keys(api).includes('GET /api/reviews/:review_id')).toBe(true);
+            expect(Object.keys(api).includes('POST /api/reviews/:review_id/comments')).toBe(true);
+            expect(Object.keys(api).includes('PATCH /api/reviews/:review_id')).toBe(true);
+            expect(Object.keys(api).includes('GET /api/users')).toBe(true);
+        });
+    });
+});
