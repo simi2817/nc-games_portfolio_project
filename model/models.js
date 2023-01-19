@@ -25,9 +25,23 @@ const fetchAllReviews = (query) =>
     }
      
     if(query.sort_by)
-        sort = `reviews.${query.sort_by}`;
+    {
+        if  (   query.sort_by === 'review_id'   ||
+                query.sort_by === 'title'       ||
+                query.sort_by === 'category'    ||
+                query.sort_by === 'designer'    ||
+                query.sort_by === 'owner'       ||
+                query.sort_by === 'review_body' ||
+                query.sort_by === 'review-img_url' ||
+                query.sort_by === 'created_at'  ||
+                query.sort_by === 'votes'
+            )
+                sort = `reviews.${query.sort_by}`;
+        else
+                return Promise.reject({status: 400, message: 'Invalid sort query!'});
+    }
     else
-        sort = `DATE(reviews.created_at)`;
+        sort = `reviews.created_at`;
 
     if(query.order)
     {
@@ -42,7 +56,7 @@ const fetchAllReviews = (query) =>
         const selectReviewQuery = 
         `SELECT reviews.*, COUNT(comments.review_id) AS comment_count
         FROM reviews
-        JOIN comments
+        LEFT JOIN comments
         ON reviews.review_id = comments.review_id
         ${where}
         GROUP BY reviews.review_id
@@ -55,14 +69,12 @@ const fetchAllReviews = (query) =>
         });
 }
 
-const fetchCategoryFromReviews = (category) =>
+const validateCategory = (category) =>
 {
     const selectCategoryQuery = 
-    `SELECT reviews.category
+    `SELECT category
     FROM reviews
-    JOIN comments
-    ON reviews.review_id = comments.review_id
-    WHERE reviews.category = $1;`;
+    WHERE category = $1;`;
 
     return db.query(selectCategoryQuery, [category])
     .then(({ rows, rowCount }) =>
@@ -212,5 +224,5 @@ module.exports = {
     fetchReviewsById,
     updateVotesById,
     fetchAllUsers,
-    fetchCategoryFromReviews
+    validateCategory
     };

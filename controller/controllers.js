@@ -7,7 +7,7 @@ const {
     fetchReviewsById,
     updateVotesById,
     fetchAllUsers,
-    fetchCategoryFromReviews
+    validateCategory
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -25,7 +25,7 @@ const getReviews = (request, response, next) =>
 
     if(query.category !== undefined)
     {
-        Promise.all([fetchCategoryFromReviews(query.category), fetchAllReviews(query)])
+        Promise.all([validateCategory(query.category),fetchAllReviews(query)])
         .then((reviews) =>
         {
             response.status(200).send({'reviews': reviews[1]});
