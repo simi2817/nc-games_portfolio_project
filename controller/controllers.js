@@ -4,9 +4,10 @@ const {
     fetchReviewById,
     fetchCommentByReviewId,
     addComment, 
-    fetchReviewsById,
+    validateReviewId,
     updateVotesById,
     fetchAllUsers,
+    validateCategory,
     removeCommentById
     } = require('../model/models');
 
@@ -19,23 +20,44 @@ const getCategories = (request, response) =>
     });
 }
 
-const getReviews = (request, response) =>
+const getReviews = (request, response, next) =>
 {
-    fetchAllReviews()
-    .then((reviews) =>
+    const { query } = request;
+
+    if(query.category !== undefined)
     {
-        response.status(200).send({'reviews': reviews});
-    });
+        Promise.all([validateCategory(query.category),fetchAllReviews(query)])
+        .then((reviews) =>
+        {
+            response.status(200).send({'reviews': reviews[1]});
+        })
+        .catch((error) =>
+        {
+            next(error);
+        });
+    }
+    else
+    {
+        fetchAllReviews(query)
+        .then((reviews) =>
+        {
+            response.status(200).send({'reviews': reviews});
+        })
+        .catch((error) =>
+        {
+            next(error);
+        });
+    }
 }
 
 const getReviewsById = (request, response, next) =>
 {
     const reviewId = request.params.review_id;
 
-    fetchReviewById(reviewId)
+    Promise.all([validateReviewId(reviewId),fetchReviewById(reviewId)])
     .then((review) =>
     {
-        response.status(200).send({'review': review});
+        response.status(200).send({'review': review[1]});
     })
     .catch((error) =>
     {
@@ -63,7 +85,7 @@ const postComment = (request, response, next) =>
     const { body } = request;
     const reviewId = request.params.review_id;
     
-    Promise.all([fetchReviewsById(reviewId), addComment(reviewId, body)])
+    Promise.all([validateReviewId(reviewId), addComment(reviewId, body)])
     .then((newComment) =>
     {   
         response.status(201).send({'comment': newComment[1]});
@@ -117,6 +139,7 @@ const deleteComment = (request, response, next) =>
         next(error);
     });
 }
+
 module.exports = { 
     getCategories,
     getReviews,
