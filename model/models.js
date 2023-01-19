@@ -91,19 +91,21 @@ const fetchReviewById = (reviewId) =>
     if(/\d+/.test(reviewId))
     {
         const selectReviewByIdQuery = 
-        `SELECT * FROM reviews
+        `SELECT *, (SELECT COUNT(comments.review_id)
+        FROM reviews
+        LEFT JOIN comments
+        ON reviews.review_id = comments.review_id
+        WHERE reviews.review_id = $1
+        GROUP BY reviews.review_id) AS comment_count
+        FROM reviews
         WHERE review_id = $1;`;
 
         return db.query(selectReviewByIdQuery, [reviewId])
         .then(({ rows }) => 
         {
-            if(rows.length === 1)
-                return rows;
-            else
-                return Promise.reject({status: 404, message: 'review_id not found!'});
+            return rows;
         });
     } 
-
     else
         return Promise.reject({status: 400, message: 'Invalid input!'});
     
@@ -124,7 +126,7 @@ const fetchCommentByReviewId = (reviewId) =>
         else
         {
             return db.query(selectCommentByReviewId, [reviewId])
-            .then(({ rows, rowCount }) =>
+            .then(({ rows }) =>
             {
                 return rows;
             });
@@ -159,9 +161,10 @@ const addComment = (reviewId, body) =>
     }
 }
         
-const fetchReviewsById = (reviewId) =>
+const validateReviewId = (reviewId) =>
 {
-    const selectReviewQuery = `SELECT review_id FROM reviews WHERE review_id = $1;`;
+    const selectReviewQuery = 
+    `SELECT review_id FROM reviews WHERE review_id = $1;`;
 
     return db.query(selectReviewQuery,[reviewId])
     .then(({ rowCount, rows }) =>
@@ -221,7 +224,7 @@ module.exports = {
     fetchReviewById,
     fetchCommentByReviewId,
     addComment,
-    fetchReviewsById,
+    validateReviewId,
     updateVotesById,
     fetchAllUsers,
     validateCategory
