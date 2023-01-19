@@ -218,6 +218,21 @@ const fetchAllUsers = () =>
     });
 }
 
+const removeCommentById = (commentId) =>
+{
+    const deleteCommentQuery = 
+    `DELETE FROM comments WHERE comment_id = $1;`;
+
+    return db.query(deleteCommentQuery,[commentId])
+    .then(({ rowCount }) =>
+    {
+        if(rowCount === 0)
+            return Promise.reject({status: 404, message: 'comment_id not found!'});
+        else
+            return;
+    });
+}
+
 module.exports = { 
     fetchAllCategories,
     fetchAllReviews,
@@ -227,5 +242,6 @@ module.exports = {
     validateReviewId,
     updateVotesById,
     fetchAllUsers,
-    validateCategory
+    validateCategory,
+    removeCommentById
     };

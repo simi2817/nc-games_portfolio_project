@@ -7,7 +7,8 @@ const {
     validateReviewId,
     updateVotesById,
     fetchAllUsers,
-    validateCategory
+    validateCategory,
+    removeCommentById
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -124,6 +125,21 @@ const getUsers = (request, response, next) =>
     });
 }
 
+const deleteComment = (request, response, next) =>
+{
+    const commentId = request.params.comment_id;
+
+    removeCommentById(commentId)
+    .then(() =>
+    {
+        response.status(204).send();
+    })
+    .catch((error) =>
+    {
+        next(error);
+    });
+}
+
 module.exports = { 
     getCategories,
     getReviews,
@@ -131,5 +147,6 @@ module.exports = {
     getCommentsByReviewId,
     postComment,
     patchVotesById,
-    getUsers
+    getUsers,
+    deleteComment
     };
