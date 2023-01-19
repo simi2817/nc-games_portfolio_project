@@ -129,7 +129,7 @@ describe('GET /api/reviews', () =>
         .then((response) =>
         {
             const { reviews } = response.body;
-            expect(reviews[0].created_at.includes('2021-01-18')).toBe(true);
+            expect(reviews[0].created_at.includes('2021-01-25')).toBe(true);
             expect(reviews).toBeSorted({key: 'created_at',
                 descending: true});
         });
@@ -157,7 +157,7 @@ describe('GET /api/reviews', () =>
                 const { reviews } = response.body;
                 expect(reviews[0].created_at.includes('1970-01-10')).toBe(false);
                 expect(reviews).toBeSorted({key: 'created_at',
-                ascending: false});
+                descending: true});
             });
         });
     });
@@ -551,6 +551,119 @@ describe('GET /api/users', () =>
     });
 });
 
+describe('GET /api/reviews (queries)', () =>
+{
+    test('server responds with review object for a given category', () =>
+    {
+        return request(app)
+        .get('/api/reviews?category=social deduction')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+
+            expect(reviews.length).toBeGreaterThan(0);
+
+            for(let review of reviews)
+                expect(review.category).toBe('social deduction');
+        })
+    });
+
+    test('server responds with review object sorted as per given column_name', () =>
+    {
+        return request(app)
+        .get('/api/reviews?sort_by=designer')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+
+            expect(reviews[0].designer).toBe('Wolfgang Warsch');
+            expect(reviews).toBeSorted({key: 'designer',
+            descending: true});
+        })
+    });
+
+    test('server responds with review object ordered in ascending order', () =>
+    {
+        return request(app)
+        .get('/api/reviews?order=asc')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews).toBeSortedBy('created_at',
+            { ascending: true });
+        })
+    });
+
+    test('server responds with review object for a given sort_by and order', () =>
+    {
+        return request(app)
+        .get('/api/reviews?sort_by=designer&order=asc')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews[0].designer).toBe('Akihisa Okui');
+            expect(reviews).toBeSortedBy('designer',
+            { ascending: true });
+        })
+    });
+
+    test('server responds with review object for a given category, sort_by and order', () =>
+    {
+        return request(app)
+        .get('/api/reviews?category=social deduction&sort_by=title&order=asc')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews[0].title).toBe('A truly Quacking Game; Quacks of Quedlinburg');
+            expect(reviews).toBeSortedBy('title',
+            { ascending: true });
+        })
+    });
+
+    describe('Errors', () =>
+    {
+        test('404 - invalid category value provided', () =>
+        {
+            return request(app)
+            .get('/api/reviews?category=mariogames')
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('category not found!');
+            });
+        });
+
+        test('400 - invalid order query provided', () =>
+        {
+            return request(app)
+            .get('/api/reviews?order=abcdef')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid order query!');
+            });
+        });
+
+        test('400 - invalid sort query provided', () =>
+        {
+            return request(app)
+            .get('/api/reviews?sort_by=abcdef')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid sort query!');
+            });
+        });
+    });
+});
 
 describe('GET /api/reviews/:review_id (comment_count)', () =>
 {
