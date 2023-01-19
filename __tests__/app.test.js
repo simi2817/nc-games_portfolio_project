@@ -699,6 +699,53 @@ describe('GET /api/reviews/:review_id (comment_count)', () =>
     });
 });
 
+describe('DELETE /api/comments/:comment_id', () =>
+{
+    test('server responds with 204 status code and No Content message once delete is successful', () =>
+    {
+        return request(app)
+        .delete('/api/comments/2')
+        .expect(204)
+        .then((response) =>
+        {
+            expect(response.res.statusMessage).toBe('No Content');
+            
+            return db.query(`SELECT * FROM comments WHERE comment_id = 2;`)
+            .then(({ rowCount }) =>
+            {
+                expect(rowCount).toBe(0);
+            });
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('404 - invalid comment_id provided not present in comments table', () =>
+        {  
+            return request(app)
+            .delete('/api/comments/100')
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('comment_id not found!');
+            });
+        });
+
+        test('400 - bad comment_id provided', () =>
+        {  
+            return request(app)
+            .delete('/api/comments/abdcdeg')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+    });
+});
+
 describe('GET /api', () =>
 {
     test('server responds with a list of all api with status code 200', () =>

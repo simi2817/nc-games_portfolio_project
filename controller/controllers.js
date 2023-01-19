@@ -8,6 +8,7 @@ const {
     updateVotesById,
     fetchAllUsers,
     validateCategory,
+    removeCommentById,
     fetchEndPoints
     } = require('../model/models');
 
@@ -125,6 +126,21 @@ const getUsers = (request, response, next) =>
     });
 }
 
+const deleteComment = (request, response, next) =>
+{
+    const commentId = request.params.comment_id;
+
+    removeCommentById(commentId)
+    .then(() =>
+    {
+        response.status(204).send();
+    })
+    .catch((error) =>
+    {
+        next(error);
+    });
+}
+
 const getEndPoints = (request, response, next) =>
 {
     fetchEndPoints()
@@ -146,5 +162,6 @@ module.exports = {
     postComment,
     patchVotesById,
     getUsers,
+    deleteComment,
     getEndPoints
     };
