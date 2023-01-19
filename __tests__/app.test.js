@@ -562,7 +562,10 @@ describe('GET /api/reviews (queries)', () =>
         {
             const { reviews } = response.body;
 
-            expect(reviews[0].category).toBe('social deduction');
+            expect(reviews.length).toBeGreaterThan(0);
+
+            for(let review of reviews)
+                expect(review.category).toBe('social deduction');
         })
     });
 
