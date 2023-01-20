@@ -133,5 +133,23 @@
         }
       ]
     }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "to update votes in comments by the value provided in the request body",
+    "sampleRequest": {
+      "inc_votes": 1
+    },
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": 1,
+          "body": "I loved this game too!",
+          "review_id": 2,
+          "author": "happyamy2016",
+          "votes": 17,
+          "created_at": 123603389
+        }
+      ]
+    }
   }
 }

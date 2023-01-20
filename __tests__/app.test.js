@@ -757,7 +757,7 @@ describe('GET /api', () =>
         {
             const { api } = response.body;
             
-            expect(Object.keys(api).length).toBe(9);
+            expect(Object.keys(api).length).toBe(10);
 
             expect(Object.keys(api).includes('GET /api')).toBe(true);
             expect(Object.keys(api).includes('GET /api/categories')).toBe(true);
@@ -767,6 +767,7 @@ describe('GET /api', () =>
             expect(Object.keys(api).includes('PATCH /api/reviews/:review_id')).toBe(true);
             expect(Object.keys(api).includes('GET /api/users')).toBe(true);
             expect(Object.keys(api).includes('GET /api/users/:username')).toBe(true);
+            expect(Object.keys(api).includes('PATCH /api/comments/:comment_id')).toBe(true);
         });
     });
 });
@@ -782,7 +783,6 @@ describe('GET /api/users/:username', () =>
         {
             const { user } = response.body;
 
-            console.log(user);
             expect(user).toHaveLength(1);
 
             expect(user[0].username).toBe('bainesface');
@@ -806,6 +806,117 @@ describe('GET /api/users/:username', () =>
             {
                 const { message } = response.body;
                 expect(message).toBe('username not found!');
+            });
+        });
+    });
+});
+
+describe('PATCH /api/comments/:comment_id', () =>
+{
+    test('server responds with status - 200 and an updated comment object for given positive number', () =>
+    {
+        return request(app)
+        .patch('/api/comments/1')
+        .send({
+            inc_votes: 1
+        })
+        .expect(200)
+        .then((response) => 
+        {
+            const { comment } = response.body;
+
+            expect(comment.votes).toBe(17);
+        });
+    });
+
+    test('server responds with  with status - 200 and an updated review object for given negative number', () =>
+    {
+        return request(app)
+        .patch('/api/comments/5')
+        .send({
+            inc_votes: -3
+        })
+        .expect(200)
+        .then((response) => 
+        {
+            const { comment } = response.body;
+
+            expect(comment.votes).toBe(10);
+        });
+    });
+
+    describe('Errors', () =>
+    {
+        test('404 - incorrect comment_id provided', () =>
+        {
+            return request(app)
+            .patch('/api/comments/15')
+            .send({
+                inc_votes: -3
+            })
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('comment_id not found!');
+            });
+
+        });
+
+        test('400 - incorrect data type for comment_id provided', () =>
+        {
+            return request(app)
+            .patch('/api/comments/games')
+            .send({
+                inc_votes: -3
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('400 - incorrect data type for votes to be updated is provided', () =>
+        {
+            return request(app)
+            .patch('/api/comments/1')
+            .send({
+                inc_votes: 'to be incremented by 1'
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('Invalid input!');
+            });
+        });
+
+        test('400 - no request body is provided', () =>
+        {
+            return request(app)
+            .patch('/api/comments/1')
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body is empty!');
+            });
+        });
+
+        test('400 - incorrect key provided in the request body', () =>
+        {
+            return request(app)
+            .patch('/api/comments/1')
+            .send({
+                update_votes: 3
+            })
+            .expect(400)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('request body must have inc_votes key!');
             });
         });
     });
