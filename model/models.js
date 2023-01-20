@@ -258,6 +258,36 @@ const fetchUserByName = (userName) =>
     });
 }
 
+const updateVoteByCommentId = (commentId, body) =>
+{
+    if(JSON.stringify(body) === '{}')
+        return Promise.reject({status: 400, message: 'request body is empty!'});
+    else
+    {
+        if(body.hasOwnProperty('inc_votes'))
+        {
+            const updateVotes = body.inc_votes;
+
+            const updateVoteQuery = `
+            UPDATE comments
+            SET votes = (votes + $1)
+            WHERE comment_id = $2
+            RETURNING *;`;
+        
+            return db.query(updateVoteQuery,[updateVotes,commentId])
+            .then(({ rows, rowCount }) =>
+            {
+                if(rowCount === 0)
+                    return Promise.reject({status: 404, message: 'comment_id not found!'});
+                else
+                    return rows[0];
+            });
+        }
+        else
+            return Promise.reject({status: 400, message: 'request body must have inc_votes key!'});
+    }
+}
+
 module.exports = { 
     fetchAllCategories,
     fetchAllReviews,
@@ -270,5 +300,6 @@ module.exports = {
     validateCategory,
     removeCommentById,
     fetchEndPoints,
-    fetchUserByName
+    fetchUserByName,
+    updateVoteByCommentId
     };

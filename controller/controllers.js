@@ -10,7 +10,8 @@ const {
     validateCategory,
     removeCommentById,
     fetchEndPoints,
-    fetchUserByName
+    fetchUserByName,
+    updateVoteByCommentId
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -170,6 +171,22 @@ const getUserByName = (request, response, next) =>
     });
 }
 
+const patchComment = (request, response, next) =>
+{
+    const commentId = request.params.comment_id;
+    const { body } = request;
+
+    updateVoteByCommentId(commentId, body)
+    .then((comment) =>
+    {
+        response.status(200).send({'comment': comment})
+    })
+    .catch((error) => 
+    {
+        next(error);
+    });
+}
+
 module.exports = { 
     getCategories,
     getReviews,
@@ -180,5 +197,6 @@ module.exports = {
     getUsers,
     deleteComment,
     getEndPoints,
-    getUserByName
+    getUserByName,
+    patchComment
     };
