@@ -9,7 +9,8 @@ const {
     fetchAllUsers,
     validateCategory,
     removeCommentById,
-    fetchEndPoints
+    fetchEndPoints,
+    fetchUserByName
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -154,6 +155,21 @@ const getEndPoints = (request, response, next) =>
     });
 }
 
+const getUserByName = (request, response, next) =>
+{
+    const userName = request.params.username;
+
+    fetchUserByName(userName)
+    .then((user) =>
+    {
+        response.status(200).send({'user': user});
+    })
+    .catch((error) => 
+    {
+        next(error);
+    });
+}
+
 module.exports = { 
     getCategories,
     getReviews,
@@ -163,5 +179,6 @@ module.exports = {
     patchVotesById,
     getUsers,
     deleteComment,
-    getEndPoints
+    getEndPoints,
+    getUserByName
     };

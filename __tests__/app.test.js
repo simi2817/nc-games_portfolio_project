@@ -757,7 +757,7 @@ describe('GET /api', () =>
         {
             const { api } = response.body;
             
-            expect(Object.keys(api).length).toBe(8);
+            expect(Object.keys(api).length).toBe(9);
 
             expect(Object.keys(api).includes('GET /api')).toBe(true);
             expect(Object.keys(api).includes('GET /api/categories')).toBe(true);
@@ -766,6 +766,47 @@ describe('GET /api', () =>
             expect(Object.keys(api).includes('POST /api/reviews/:review_id/comments')).toBe(true);
             expect(Object.keys(api).includes('PATCH /api/reviews/:review_id')).toBe(true);
             expect(Object.keys(api).includes('GET /api/users')).toBe(true);
+            expect(Object.keys(api).includes('GET /api/users/:username')).toBe(true);
+        });
+    });
+});
+
+describe('GET /api/users/:username', () =>
+{
+    test('server responds with 200 status code and a user object for a given username', () =>
+    {
+        return request(app)
+        .get('/api/users/bainesface')
+        .expect(200)
+        .then((response) =>
+        {
+            const { user } = response.body;
+
+            console.log(user);
+            expect(user).toHaveLength(1);
+
+            expect(user[0].username).toBe('bainesface');
+
+            expect(user[0]).toHaveProperty('username', expect.any(String));
+            expect(user[0]).toHaveProperty('name', expect.any(String));
+            expect(user[0]).toHaveProperty('avatar_url', expect.any(String));
+
+
+        })
+    });
+
+    describe('Errors', () =>
+    {
+        test('404 - invalid username', () =>
+        {
+            return request(app)
+            .get('/api/users/mario')
+            .expect(404)
+            .then((response) =>
+            {
+                const { message } = response.body;
+                expect(message).toBe('username not found!');
+            });
         });
     });
 });
