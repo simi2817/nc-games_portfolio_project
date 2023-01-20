@@ -1,12 +1,54 @@
 # Northcoders House of Games API
 
+## Link to hosted version - 
+
+https://silverfox-ncgames.onrender.com/api
+
+## Summary
+
+This repo has APIs to connect to following tables - 
+
+1) Categories
+2) Comments
+3) Reviews
+4) Users
+
+All the available API endpoints are listed under /api.
+
+## Versions
+
+This project is using Node.js v19.1.0 and PostgreSQL 14.5.
+
+## Clone
+
+Fork the repo and clone it to your local machine.
+
+## Seeding
+
+1) run the script setup-dbs (to setup the databases)
+2) run the seed script (to seed the database with required data)
+
+## Dependecies
+
+Following are the dependencies required (if they are not present in package.json, please install them!)
+- dotenv
+- express
+- pg
+- supertest
+
+devDependecies:
+- jest
+- jest-extended
+- jest-sorted (Check out [the documentation for jest-sorted])
+- pg-format
+
 ## To create environment variables
 
 Please create two files :-
 1) .env.test  with PGDATABASE=nc_games_test
 2) .env.development with PGDATABASE=nc_games
 
-With the above files, connection.js would be able to connect test and development databases.
+With the above files, connection.js would be able to connect test and development databases. (Make a note to .gitignore them!)
 
 ## Kanban
 
