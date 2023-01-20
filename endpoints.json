@@ -120,5 +120,18 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves an array of a user for a given username",
+    "queries": [],
+    "exampleResponse": {
+      "user": [
+        {
+          "username": "mallionaire",
+          "name": "naz",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+      ]
+    }
   }
 }

@@ -1,4 +1,6 @@
 const express = require('express');
+const app = express();
+app.use(express.json());
 
 const apiRouter = require('../routes/api-router');
 
@@ -8,10 +10,6 @@ const {
         handleServerErrors, 
         handlePathNotFoundErrors 
       } = require('../errors/index');
-
-const app = express();
-
-app.use(express.json());
 
 app.use('/api', apiRouter);
 

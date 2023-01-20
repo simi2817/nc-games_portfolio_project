@@ -244,6 +244,20 @@ const fetchEndPoints = () =>
     });
 }
 
+const fetchUserByName = (userName) =>
+{
+    const selectUserQuery = `SELECT * FROM users WHERE username = $1;`;
+
+    return db.query(selectUserQuery, [userName])
+    .then(({ rows, rowCount }) =>
+    {
+        if(rowCount === 0)
+            return Promise.reject({status: 404, message: 'username not found!'});
+        else
+            return rows;
+    });
+}
+
 module.exports = { 
     fetchAllCategories,
     fetchAllReviews,
@@ -255,5 +269,6 @@ module.exports = {
     fetchAllUsers,
     validateCategory,
     removeCommentById,
-    fetchEndPoints
+    fetchEndPoints,
+    fetchUserByName
     };
