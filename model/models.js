@@ -288,6 +288,11 @@ const updateVoteByCommentId = (commentId, body) =>
     }
 }
 
+const addReview = (body) =>
+{
+    
+}
+
 module.exports = { 
     fetchAllCategories,
     fetchAllReviews,
@@ -301,5 +306,6 @@ module.exports = {
     removeCommentById,
     fetchEndPoints,
     fetchUserByName,
-    updateVoteByCommentId
+    updateVoteByCommentId,
+    addReview
     };

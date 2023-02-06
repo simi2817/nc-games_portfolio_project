@@ -11,7 +11,8 @@ const {
     removeCommentById,
     fetchEndPoints,
     fetchUserByName,
-    updateVoteByCommentId
+    updateVoteByCommentId,
+    addReview
     } = require('../model/models');
 
 const getCategories = (request, response) =>
@@ -187,6 +188,17 @@ const patchComment = (request, response, next) =>
     });
 }
 
+const postReview = (request, response) =>
+{
+    const { body } = request;
+
+    addReview(body)
+    .then((newReview) => 
+    {
+        response.status(201).send({'newReview': newReview});
+    });
+}
+
 module.exports = { 
     getCategories,
     getReviews,
@@ -198,5 +210,6 @@ module.exports = {
     deleteComment,
     getEndPoints,
     getUserByName,
-    patchComment
+    patchComment,
+    postReview
     };

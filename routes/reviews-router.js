@@ -4,7 +4,8 @@ const   {
             getReviewsById,
             patchVotesById,
             getCommentsByReviewId,
-            postComment
+            postComment,
+            postReview
         } = require('../controller/controllers');
 
 reviewRouter
@@ -26,5 +27,9 @@ reviewRouter
 reviewRouter
 .route('/:review_id/comments')
 .post(postComment);
+
+reviewRouter
+.route('/')
+.post(postReview);
 
 module.exports = reviewRouter;

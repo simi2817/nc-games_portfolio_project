@@ -921,3 +921,26 @@ describe('PATCH /api/comments/:comment_id', () =>
         });
     });
 });
+
+// describe('POST /api/reviews', () =>
+// {
+//     test('server responds with 201 status code and the newly added review', () =>
+//     {
+//         return request(app)
+//         .post('/api/reviews')
+//         .send({
+//             title: 'Mr Fox',
+//             category: 'dexterity',
+//             designer: 'Silver Lee',
+//             owner: 'mallionaire',
+//             review_body: 'Fantastic Game!'
+//         })
+//         .expect(201)
+//         .then((response) =>
+//         {
+//             const { newReview } = response.body;
+
+//             console.log(newReview);
+//         })
+//     })
+// })
