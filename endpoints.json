@@ -121,6 +121,10 @@
       ]
     }
   },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment for a given comment_id",
+    "sample-url": "/api/comments/2"
+  },
   "GET /api/users/:username": {
     "description": "serves an array of a user for a given username",
     "queries": [],
