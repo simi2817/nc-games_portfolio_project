@@ -35,9 +35,14 @@ const fetchAllReviews = (query) =>
                 query.sort_by === 'review_body' ||
                 query.sort_by === 'review-img_url' ||
                 query.sort_by === 'created_at'  ||
-                query.sort_by === 'votes'
-            )
+                query.sort_by === 'votes' ||
+                query.sort_by === 'comment_count'
+            ) {
+                if(query.sort_by === 'comment_count')
+                    sort = `${query.sort_by}`;
+                else
                 sort = `reviews.${query.sort_by}`;
+            }
         else
                 return Promise.reject({status: 400, message: 'Invalid sort query!'});
     }

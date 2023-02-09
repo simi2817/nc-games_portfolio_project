@@ -551,7 +551,7 @@ describe('GET /api/users', () =>
     });
 });
 
-describe('GET /api/reviews (queries)', () =>
+describe.only('GET /api/reviews (queries)', () =>
 {
     test('server responds with review object for a given category', () =>
     {
@@ -622,6 +622,20 @@ describe('GET /api/reviews (queries)', () =>
             expect(reviews[0].title).toBe('A truly Quacking Game; Quacks of Quedlinburg');
             expect(reviews).toBeSortedBy('title',
             { ascending: true });
+        })
+    });
+
+    test('server responds with sorted review object according to comment_count', () =>
+    {
+        return request(app)
+        .get('/api/reviews?sort_by=comment_count')
+        .expect(200)
+        .then((response) =>
+        {
+            const { reviews } = response.body;
+            expect(reviews[0].title).toBe('Ultimate Werewolf');
+            expect(reviews).toBeSortedBy('comment_count',
+            { descending: true });
         })
     });
 
